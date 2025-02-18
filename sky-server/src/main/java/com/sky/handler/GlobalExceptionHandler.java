@@ -63,4 +63,10 @@ public class GlobalExceptionHandler {
         return Result.error(ex.getMessage());
     }
 
+    @ExceptionHandler
+    public Result<String> IllegalArgumentExceptionExceptionHandler(IllegalArgumentException ex){
+        log.error("异常信息：{}", ex.getMessage());
+        return Result.error(ex.getMessage());
+    }
+
 }
