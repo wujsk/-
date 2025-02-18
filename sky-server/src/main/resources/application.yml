@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/sky_take_out?zeroDate=use_round&serverZoneId=Asia/Shanghai
+    username: root
+    password: jiaoSDSSKaiai123
+  data:
+    redis:
+      database: 1
+      host: 120.46.13.225
+      port: 6379
+      password: jiaoSDSSKaiai123
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+
+sa-token:
+  token-name: satoken
+  timeout: 2592000
+  active-timeout: -1
+  is-concurrent: false
+  is-share: true
+  is-log: true
+  jwt-secret-key: jiaoshaokangshihahaha
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG  # R2DBC 日志
+    io.r2dbc.pool: DEBUG              # 连接池日志
+    org.springframework.data.r2dbc: DEBUG  # Spring Data R2DBC 日志
+    com.sky: debug
