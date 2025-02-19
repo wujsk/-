@@ -7,15 +7,12 @@ import com.sky.properties.WeChatProperties;
 import com.sky.service.OrderService;
 import com.wechat.pay.contrib.apache.httpclient.util.AesUtil;
 import jakarta.annotation.Resource;
-import org.apache.http.entity.ContentType;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Mono;
 
 import java.io.BufferedReader;
@@ -61,12 +58,8 @@ public class PayNotifyController {
                         String transactionId = jsonObject.getString("transaction_id");//微信支付交易号
                         System.out.println("商户平台订单号：" + outTradeNo);
                         System.out.println("微信支付交易号：" + transactionId);
-                        return orderService.paySuccess(outTradeNo);
-                    } catch (Exception e) {
-                        return Mono.error(new BaseException("响应微信失败"));
-                    }
-                    try {
-                        return responseToWeixin(response);
+                        return orderService.paySuccess(outTradeNo)
+                                .then(responseToWeixin(response));
                     } catch (Exception e) {
                         return Mono.error(new BaseException("响应微信失败"));
                     }
