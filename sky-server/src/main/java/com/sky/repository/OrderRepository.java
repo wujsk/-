@@ -4,6 +4,8 @@ import com.sky.dto.OrderReportDTO;
 import com.sky.dto.OrderSummaryDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import com.sky.vo.OrderVO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -154,4 +156,44 @@ public interface OrderRepository extends R2dbcRepository<Orders, Long> {
             "AND (:status IS NULL OR status = :status)")
     Mono<Double> sumByMap(LocalDateTime begin, LocalDateTime end, Integer status);
 
+    /**
+     * 查询订单列表
+     * @param number 订单编号
+     * @param phone 手机号
+     * @param status 订单状态
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @param userId 用户 ID
+     * @param pageable 分页信息
+     * @return 订单列表的 Flux
+     */
+    @Query("SELECT o.* FROM orders o " +
+            "WHERE (:number IS NULL OR o.number LIKE concat('%', :number, '%')) " +
+            "AND (:phone IS NULL OR o.phone LIKE concat('%', :phone, '%')) " +
+            "AND (:status IS NULL OR o.status = :status) " +
+            "AND (:beginTime IS NULL OR o.create_time >= :beginTime) " +
+            "AND (:endTime IS NULL OR o.create_time <= :endTime) " +
+            "AND (:userId IS NULL OR o.user_id = :userId) " +
+            "ORDER BY o.create_time DESC " +
+            "LIMIT :#{#pageable.pageSize} OFFSET :#{#pageable.offset}")
+    Flux<Orders> queryOrderList(String number, String phone, Integer status, LocalDateTime beginTime, LocalDateTime endTime, Long userId, Pageable pageable);
+
+    /**
+     * 查询订单数量
+     * @param number 订单编号
+     * @param phone 手机号
+     * @param status 订单状态
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @param userId 用户 ID
+     * @return 订单数量的 Mono
+     */
+    @Query("SELECT COUNT(*) FROM orders o " +
+            "WHERE (:number IS NULL OR o.number LIKE concat('%', :number, '%')) " +
+            "AND (:phone IS NULL OR o.phone LIKE concat('%', :phone, '%')) " +
+            "AND (:status IS NULL OR o.status = :status) " +
+            "AND (:beginTime IS NULL OR o.create_time >= :beginTime) " +
+            "AND (:endTime IS NULL OR o.create_time <= :endTime) " +
+            "AND (:userId IS NULL OR o.user_id = :userId)")
+    Mono<Long> queryOrderCount(String number, String phone, Integer status, LocalDateTime beginTime, LocalDateTime endTime, Long userId);
 }
